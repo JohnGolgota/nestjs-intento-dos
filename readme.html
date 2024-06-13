@@ -1,0 +1,92 @@
+
+<h1>API Rest Template con Node.js, NestJS y Docker</h1>
+<p>Mi imagen es una simple API REST extraída de las sugerencias de
+    <a href="https://www.youtube.com/@HolaMundoDev" target="_blank">HolaMundo</a>
+    en YouTube, es un template para el desarrollo de API REST con Node.js usando NestJS y Docker.
+</p>
+<p>Está creada con las instrucciones de un Dockerfile con múltiples stages orientados a diferentes entornos,
+    específicamente: development, test y production.
+</p>
+<p>La imagen en mi Docker Hub, sería producción por estar optimizada para consumir los mínimos recursos de la
+    aplicación web.</p>
+
+<b>Uso desde Docker Hub:</b>
+<pre><code>docker pull johngolgota/holamundo-app-template:0.0.3</code></pre>
+
+<b>Para ejecutar la imagen en Docker Hub:</b>
+<pre><code>docker run -p 3000:3000 johngolgota/holamundo-app-template:0.0.3</code></pre>
+
+<p>Despues puedes visitar la url http://localhost:3000 y ver la salida de la api.</p>
+
+<b>El archivo Dockerfile es el siguiente:</b>
+<pre><code>FROM node:20-alpine3.18 AS base
+
+ENV DIR /app
+WORKDIR $DIR
+ARG NPM_TOKEN
+
+FROM base AS dev
+
+ENV NODE_ENV=development
+
+COPY package*.json .
+
+RUN echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ".npmrc" && \
+npm ci && \
+rm -f .npmrc
+
+COPY tsconfig*.json .
+COPY .swcrc .
+COPY nest-cli.json .
+COPY src src
+
+EXPOSE $PORT
+CMD ["npm", "run", "dev"]
+
+FROM base AS build
+
+RUN apk update && apk add --no-cache dumb-init=1.2.5-r2
+
+COPY package*.json .
+# Bellow npm install is a workaround for https://github.com/swc-project/swc/issues/5616#issuecomment-1651214641
+RUN echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ".npmrc" && \
+npm install --save-optional \
+"@swc/core-linux-x64-gnu@1" \
+"@swc/core-linux-x64-musl@1" && \
+rm -f .npmrc
+
+COPY tsconfig*.json .
+COPY .swcrc .
+COPY nest-cli.json .
+COPY src src
+
+RUN npm run build && \
+npm prune --production
+
+FROM base AS production
+
+ENV NODE_ENV=production
+ENV USER=node
+
+COPY --from=build /usr/bin/dumb-init /usr/bin/dumb-init
+COPY --from=build $DIR/node_modules node_modules
+COPY --from=build $DIR/dist dist
+
+USER $USER
+EXPOSE $PORT
+CMD ["dumb-init", "node", "dist/main.js"]</code></pre>
+
+<p>Para otros entornos como development usarías en lugar de la imagen en Docker Hub, el repositorio de
+    <a href="https://github.com/JohnGolgota/nestjs-intento-dos" target="_blank">Github</a>.
+</p>
+<p>Este mismo texto lo encuentras en el archivo README.md en el repositorio de Github
+    <a href="https://github.com/JohnGolgota/nestjs-intento-dos" target="_blank">nestjs-intento-dos</a>.
+</p>
+
+<h2>Repositorio de Docker:</h2>
+<p><a href="https://hub.docker.com/r/johngolgota/holamundo-app-template"
+        target="_blank">johngolgota/holamundo-app-template</a></p>
+
+<div>
+Queria hacer mas, pero me quede sin tiempo.
+</div>
