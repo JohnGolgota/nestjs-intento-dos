@@ -44,7 +44,7 @@
     "@nestjs/core": "^11.0.11",
     "@nestjs/platform-fastify": "^10.3.9",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.2"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.8.0",
