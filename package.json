@@ -83,7 +83,7 @@
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.4.5",
     "unplugin-swc": "^1.5.1",
-    "vite": "^5.2.13",
+    "vite": "^6.2.6",
     "vitest": "^3.0.9",
     "vitest-mock-extended": "^3.0.1"
   }
