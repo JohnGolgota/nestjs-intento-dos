@@ -38,7 +38,7 @@
     "typos": "if command -v typos >/dev/null 2>&1; then typos; else echo \"Typos cli tool is not installed, aborting checking typos. If you want to install it you can run 'brew install typos-cli'\"; fi"
   },
   "dependencies": {
-    "@nestjs/cli": "^11.0.7",
+    "@nestjs/cli": "^11.0.14",
     "@nestjs/common": "^11.1.5",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.1.2",
